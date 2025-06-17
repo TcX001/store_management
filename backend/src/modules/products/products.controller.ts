@@ -31,7 +31,7 @@ export class ProductController {
   @Header('Content-Type', 'text/csv')
   @Header('Content-Disposition', 'attachment; filename="products.csv"')
   async export(): Promise<string> {
-    const products = await this.productService.findAll();
+    const products = await this.productService.findAllWithDeleted();
     return papaparse.unparse(products);
   }
 

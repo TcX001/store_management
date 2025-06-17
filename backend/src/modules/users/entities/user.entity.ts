@@ -22,9 +22,6 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @Column({ default: true })
-  type: boolean; 
-
   @OneToMany(() => Order, (order) => order.user)
   orders: Relation<Order>[];
 

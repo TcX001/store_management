@@ -53,7 +53,8 @@ export class OrdersService {
       await this.cacheService.del('products:all');
 
       for (const item of createOrderDto.items) {
-        const cacheKey = `product:${item.productId}`;
+        const cacheKey = `products:${item.productId}`;
+        console.log(cacheKey);
         await this.cacheService.del(cacheKey);
         console.log(`CACHE INVALIDATED: ${cacheKey} 🗑️`);
       }

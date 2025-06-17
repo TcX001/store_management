@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, UpdateResult, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
@@ -31,6 +31,11 @@ async create(data: CreateProductDto): Promise<Product> {
   }
 }
 
+  async findAllWithDeleted(): Promise<Product[]> {
+    return this.repo.find({
+      withDeleted: true,
+    });
+  }
 
   async findAll(): Promise<Product[]> {
     const cacheKey = 'products:all';
@@ -59,7 +64,8 @@ async create(data: CreateProductDto): Promise<Product> {
 
   async update(id: number, data: UpdateProductDto): Promise<Product | null> {
     await this.repo.update(id, data);
-    const updatedProduct = await this.findOne(id);
+    const updatedProduct = await this.repo.findOne({ where: { id } });
+    console.log('Updated Product:', updatedProduct);
 
     if (updatedProduct) {
       await this.cacheService.del('products:all');
@@ -71,6 +77,19 @@ async create(data: CreateProductDto): Promise<Product> {
 
 
   async remove(id: number): Promise<UpdateResult> {
+    const product = await this.repo.findOne({
+      where: { id },
+      withDeleted: true,
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    if (product.deletedAt) {
+      return; 
+    }
+
     const result = await this.repo.softDelete(id);
 
     if (result.affected && result.affected > 0) {

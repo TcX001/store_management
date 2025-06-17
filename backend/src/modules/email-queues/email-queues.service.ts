@@ -8,7 +8,10 @@ export class EmailQueueService {
   constructor(@InjectQueue('email') private emailQueue: Queue) {}
 
   async enqueueEmail(data: EnqueueEmailDto) {
-    const job = await this.emailQueue.add(data);
+    const job = await this.emailQueue.add(data, {
+      removeOnComplete: true, 
+      removeOnFail: true,   
+    });
     return job.id;
   }
 
