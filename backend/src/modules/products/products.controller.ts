@@ -13,7 +13,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import * as papaparse from 'papaparse';
-import { ProductService } from './product.service';
+import { ProductService } from './products.service';
 import { Product } from './entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';

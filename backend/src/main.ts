@@ -15,10 +15,6 @@ async function bootstrap() {
     transform: true,
   }));
 
-    // logger.log(configService.get('API_PREFIX'));
-
-  // app.setGlobalPrefix(configService.get('API_PREFIX') ?? 'api');
-
   const config = new DocumentBuilder()
     .setTitle('NestJS API')
     .setDescription('The NestJS API description')

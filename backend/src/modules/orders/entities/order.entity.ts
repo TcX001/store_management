@@ -7,7 +7,7 @@ import {
   Relation,
   ManyToOne,
 } from 'typeorm';
-import  { OrderItem } from '../../orderitems/entities/orderitem.entity';
+import  { OrderItem } from '../../order-items/entities/orderitem.entity';
 import  { User } from '../../users/entities/user.entity';
 
 @Entity('orders')

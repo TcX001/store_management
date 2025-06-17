@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { EmailQueueService } from './email-queue.service';
+import { EmailQueueService } from './email-queues.service';
 import { EnqueueEmailDto } from './dto/enqueue-email.dto';
 
 @Controller('emails/queue')

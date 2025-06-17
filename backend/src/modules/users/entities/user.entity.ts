@@ -6,7 +6,7 @@ import {
   Relation,
 } from 'typeorm';
 import { Order } from '../../orders/entities/order.entity';
-import { Auth } from '../../auth/entities/auth.entity';
+import { Auth } from '../../auths/entities/auth.entity';
 
 @Entity('users')
 export class User {

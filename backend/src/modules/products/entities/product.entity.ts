@@ -8,7 +8,7 @@ import {
   OneToMany,
   Relation,
 } from 'typeorm';
-import { OrderItem } from '../../orderitems/entities/orderitem.entity';
+import { OrderItem } from '../../order-items/entities/orderitem.entity';
 
 @Entity('products')
 export class Product {

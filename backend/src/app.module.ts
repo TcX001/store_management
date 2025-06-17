@@ -5,14 +5,14 @@ import { DatabaseModule } from './shared/database/database.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
+import { UserModule } from './modules/users/users.module';
+import { ProductModule } from './modules/products/products.module';
+import { OrderModule } from './modules/orders/orders.module';
+import { OrderitemModule } from './modules/order-items/order-items.module';
+import { CacheModule } from './shared/cache/cache.module';
+import { EmailQueueModule } from './modules/email-queues/email-queues.module';
+import {AuthModule} from './modules/auths/auths.module';
 
-import { UserModule } from './modules/users/user.module';
-import { ProductModule } from './modules/products/product.module';
-import { OrderModule } from './modules/orders/order.module';
-import { OrderitemModule } from './modules/orderitems/orderitem.module';
-import { CacheModule } from './cache/cache.module';
-import { EmailQueueModule } from './modules/email-queues/email-queue.module';
-import {AuthModule} from './modules/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({

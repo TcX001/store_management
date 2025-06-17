@@ -1,12 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Order } from './entities/order.entity';
-import { OrderItem } from '../orderitems/entities/orderitem.entity';
 import { User } from '../users/entities/user.entity';
-import { Product } from '../products/entities/product.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { CacheService } from '../../cache/cache.service'; 
+import { CacheService } from '../../shared/cache/cache.service';
+import { OrderItemsService } from '../order-items/order-items.service'; 
 
 @Injectable()
 export class OrdersService {
@@ -15,10 +14,13 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
     private readonly dataSource: DataSource,
     private readonly cacheService: CacheService,
+    private readonly orderItemsService: OrderItemsService, // 2. Inject Service ใหม่
   ) {}
 
   async findAll(): Promise<Order[]> {
-    return this.orderRepository.find({ relations: ['user', 'items', 'items.product'] });
+    return this.orderRepository.find({
+      relations: ['user', 'items', 'items.product'],
+    });
   }
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
@@ -34,68 +36,47 @@ export class OrdersService {
       if (!user) {
         throw new NotFoundException(`ไม่พบผู้ใช้งาน ID: ${userId}`);
       }
-      
+
       const newOrder = new Order();
       newOrder.user = user;
       const savedOrder = await queryRunner.manager.save(newOrder);
 
-      const orderItems = await Promise.all(items.map(async (item) => {
+      // 3. เรียกใช้ Service ใหม่เพื่อสร้าง OrderItem แทน Logic เดิมทั้งหมด
+      await this.orderItemsService.createItemsForOrder(
+        items,
+        savedOrder,
+        queryRunner.manager,
+      );
 
-        const product = await queryRunner.manager.findOne(Product, {
-          where: { id: item.productId },
-          lock: { mode: 'pessimistic_write' },
-        });
-
-        if (!product) {
-          throw new NotFoundException(`ไม่พบสินค้า ID: ${item.productId}`);
-        }
-
-        if (product.stock < item.quantity) {
-          throw new BadRequestException(`สินค้า '${product.name}' มีไม่เพียงพอ (คงเหลือ: ${product.stock})`);
-        }
-
-        product.stock -= item.quantity;
-        await queryRunner.manager.save(product); 
-
-        const orderItem = new OrderItem();
-        orderItem.product = product;
-        orderItem.quantity = item.quantity;
-        orderItem.price = product.price;
-        orderItem.order = savedOrder;
-        return orderItem;
-      }));
-
-      await queryRunner.manager.save(orderItems);
-      
       await queryRunner.commitTransaction();
 
-    console.log('Order successful, invalidating product cache...');
-      await this.cacheService.del('products:all')
+      // Invalidate cache หลังจาก commit transaction สำเร็จ
+      console.log('Order successful, invalidating product cache...');
+      await this.cacheService.del('products:all');
 
       for (const item of createOrderDto.items) {
         const cacheKey = `product:${item.productId}`;
-        await this.cacheService.del(cacheKey); 
+        await this.cacheService.del(cacheKey);
         console.log(`CACHE INVALIDATED: ${cacheKey} 🗑️`);
       }
 
-      const order = await this.orderRepository.findOne({
+      // ดึงข้อมูล Order ที่สมบูรณ์เพื่อส่งคืน
+      const finalOrder = await this.orderRepository.findOne({
         where: { id: savedOrder.id },
         relations: ['user', 'items', 'items.product'],
       });
 
-      if (!order) {
-        throw new NotFoundException(`ไม่พบคำสั่งซื้อ ID: ${savedOrder.id}`);
+      if (!finalOrder) {
+        // กรณีนี้ไม่ควรจะเกิดขึ้น แต่ใส่ไว้เพื่อความปลอดภัย
+        throw new NotFoundException(`ไม่พบคำสั่งซื้อ ID: ${savedOrder.id} หลังสร้างเสร็จ`);
       }
 
-      return order;
-
+      return finalOrder;
     } catch (err) {
-      
       await queryRunner.rollbackTransaction();
       throw err;
     } finally {
-
-        await queryRunner.release();
+      await queryRunner.release();
     }
   }
 }

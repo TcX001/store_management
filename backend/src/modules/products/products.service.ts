@@ -2,7 +2,7 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, UpdateResult, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
-import { CacheService } from '../../cache/cache.service'; 
+import { CacheService } from '../../shared/cache/cache.service'; 
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
