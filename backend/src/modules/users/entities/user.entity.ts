@@ -19,7 +19,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ select: true })
+  @Column({ select: false })
   password: string;
 
   @Column({ default: true })
