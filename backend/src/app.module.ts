@@ -6,10 +6,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 
-import { UsersModule } from './modules/users/user.module';
+import { UserModule } from './modules/users/user.module';
 import { ProductModule } from './modules/products/product.module';
-import { OrdersModule } from './modules/orders/order.module';
-import { OrderItemsModule } from './modules/orderitems/orderitem.module';
+import { OrderModule } from './modules/orders/order.module';
+import { OrderitemModule } from './modules/orderitems/orderitem.module';
 import { CacheModule } from './cache/cache.module';
 import { EmailQueueModule } from './modules/email-queues/email-queue.module';
 import {AuthModule} from './modules/auth/auth.module';
@@ -23,9 +23,9 @@ import {AuthModule} from './modules/auth/auth.module';
     
     ProductModule,
     CacheModule,
-    UsersModule,
-    OrdersModule,
-    OrderItemsModule,
+    UserModule,
+    OrderModule,
+    OrderitemModule,
     EmailQueueModule,
     AuthModule,
 
