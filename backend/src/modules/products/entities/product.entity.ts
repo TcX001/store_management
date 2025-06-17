@@ -4,7 +4,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  DeleteDateColumn,   // เพิ่ม
+  DeleteDateColumn,  
   OneToMany,
   Relation,
 } from 'typeorm';

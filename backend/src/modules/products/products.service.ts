@@ -74,7 +74,6 @@ async create(data: CreateProductDto): Promise<Product> {
     const result = await this.repo.softDelete(id);
 
     if (result.affected && result.affected > 0) {
-      // ล้าง cache ตามเดิม
       await this.cacheService.del('products:all');
       await this.cacheService.del(`products:${id}`);
     }

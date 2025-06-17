@@ -1,7 +1,6 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('jwt', () => {
-  // เพิ่มการตรวจสอบว่ามีค่าหรือไม่
   if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
     throw new Error('JWT Secret keys must be defined in environment variables');
   }

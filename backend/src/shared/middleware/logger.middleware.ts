@@ -9,7 +9,7 @@ export class LoggerMiddleware implements NestMiddleware, OnModuleInit {
   private readonly logger = new Logger('HTTP');
 
   onModuleInit() {
-    const logDir = path.join(__dirname, '..', '..', '..', 'logs');
+    const logDir = path.join(process.cwd(), 'logs');
     const logFile = path.join(logDir, 'access.log');
 
     fs.mkdirSync(logDir, { recursive: true });

@@ -14,7 +14,7 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
     private readonly dataSource: DataSource,
     private readonly cacheService: CacheService,
-    private readonly orderItemsService: OrderItemsService, // 2. Inject Service ใหม่
+    private readonly orderItemsService: OrderItemsService, 
   ) {}
 
   async findAll(): Promise<Order[]> {
@@ -41,7 +41,6 @@ export class OrdersService {
       newOrder.user = user;
       const savedOrder = await queryRunner.manager.save(newOrder);
 
-      // 3. เรียกใช้ Service ใหม่เพื่อสร้าง OrderItem แทน Logic เดิมทั้งหมด
       await this.orderItemsService.createItemsForOrder(
         items,
         savedOrder,
@@ -50,7 +49,6 @@ export class OrdersService {
 
       await queryRunner.commitTransaction();
 
-      // Invalidate cache หลังจาก commit transaction สำเร็จ
       console.log('Order successful, invalidating product cache...');
       await this.cacheService.del('products:all');
 
@@ -60,14 +58,12 @@ export class OrdersService {
         console.log(`CACHE INVALIDATED: ${cacheKey} 🗑️`);
       }
 
-      // ดึงข้อมูล Order ที่สมบูรณ์เพื่อส่งคืน
       const finalOrder = await this.orderRepository.findOne({
         where: { id: savedOrder.id },
         relations: ['user', 'items', 'items.product'],
       });
 
       if (!finalOrder) {
-        // กรณีนี้ไม่ควรจะเกิดขึ้น แต่ใส่ไว้เพื่อความปลอดภัย
         throw new NotFoundException(`ไม่พบคำสั่งซื้อ ID: ${savedOrder.id} หลังสร้างเสร็จ`);
       }
 
