@@ -1,8 +1,6 @@
-// jwt-refresh.strategy.ts
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-// Import UnauthorizedException to handle the error case
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 

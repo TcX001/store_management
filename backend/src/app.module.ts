@@ -19,7 +19,9 @@ import {AuthModule} from './modules/auth/auth.module';
       isGlobal: true,
       load: config,       
     }),
-    DatabaseModule,
+
+    DatabaseModule.forRoot({ configKey: 'database' }), 
+    DatabaseModule.forRoot({ configKey: 'sqlite' }),  
     
     ProductModule,
     CacheModule,

@@ -15,7 +15,7 @@ import { UserModule } from '../users/user.module';
   imports: [
     TypeOrmModule.forFeature([Auth]),
     PassportModule,
-    UsersModule, 
+    UserModule, 
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

@@ -1,29 +1,32 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseConfig } from '../../config'; 
+import { TypeOrmModule, TypeOrmModuleAsyncOptions } from '@nestjs/typeorm';
 
-@Module({
-  imports: [
-    ConfigModule.forFeature(DatabaseConfig),
-    TypeOrmModule.forRootAsync({
+interface DatabaseModuleOptions {
+  configKey: string;
+}
+
+@Module({})
+export class DatabaseModule {
+  static forRoot(options: DatabaseModuleOptions): DynamicModule {
+    const typeOrmAsyncOptions: TypeOrmModuleAsyncOptions = {
       imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const db = config.get('database');
-        return {
-          type: db.type,
-          host: db.host,
-          port: db.port,
-          username: db.username,
-          password: db.password,
-          database: db.database,
-          synchronize: db.synchronize,
-          autoLoadEntities: db.autoLoadEntities,
-        };
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = configService.get(options.configKey);
+        if (!dbConfig) {
+          throw new Error(
+            `Configuration for key '${options.configKey}' not found.`,
+          );
+        }
+        return dbConfig;
       },
-    }),
-  ],
-  exports: [TypeOrmModule],
-})
-export class DatabaseModule {}
+      inject: [ConfigService],
+    };
+
+    return {
+      module: DatabaseModule,
+      imports: [TypeOrmModule.forRootAsync(typeOrmAsyncOptions)],
+      exports: [TypeOrmModule],
+    };
+  }
+}
