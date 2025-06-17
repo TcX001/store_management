@@ -1,0 +1,13 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# เปลี่ยนจาก yarn.lock เป็น package-lock.json
+COPY package.json package-lock.json ./
+
+# เปลี่ยนจาก yarn install เป็น npm install
+# npm ci (clean install) จะเร็วกว่าและเหมาะกับ Docker แต่ npm install ก็ใช้ได้
+RUN npm ci
+
+# คำสั่งนี้เหมือนเดิม เพราะ "dev" ถูกกำหนดไว้ใน package.json
+CMD ["npm", "run", "start:dev"]
