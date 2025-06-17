@@ -87,7 +87,7 @@ async create(data: CreateProductDto): Promise<Product> {
     }
 
     if (product.deletedAt) {
-      return; 
+      return product; 
     }
 
     const result = await this.repo.softDelete(id);
